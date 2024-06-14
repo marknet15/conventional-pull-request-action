@@ -6,6 +6,29 @@ require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -20,7 +43,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.lint = void 0;
-const github_1 = __importDefault(__nccwpck_require__(5438));
+const github = __importStar(__nccwpck_require__(5438));
 const lint_1 = __importDefault(__nccwpck_require__(7930));
 const conventional_commits_parser_1 = __importDefault(__nccwpck_require__(6528));
 const config_1 = __nccwpck_require__(352);
@@ -35,11 +58,11 @@ const lint = () => __awaiter(void 0, void 0, void 0, function* () {
     if (!GITHUB_TOKEN) {
         return (0, fails_1.setFailedMissingToken)();
     }
-    const octokit = github_1.default.getOctokit(GITHUB_TOKEN);
-    if (!github_1.default.context.payload.pull_request) {
+    const octokit = github.getOctokit(GITHUB_TOKEN);
+    if (!github.context.payload.pull_request) {
         return (0, fails_1.setFailedPrNotFound)();
     }
-    const { number: pullNumber, base: { user: { login: owner }, repo: { name: repo } } } = github_1.default.context.payload.pull_request;
+    const { number: pullNumber, base: { user: { login: owner }, repo: { name: repo } } } = github.context.payload.pull_request;
     const { data: pullRequest } = yield octokit.rest.pulls.get({
         owner,
         repo,
@@ -96,13 +119,33 @@ catch (e) {
 
 "use strict";
 
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.errorPrTitle = void 0;
-const core_1 = __importDefault(__nccwpck_require__(2186));
-const errorPrTitle = (message) => core_1.default.error(`⛔️ PR title: ${message}`);
+const core = __importStar(__nccwpck_require__(2186));
+const errorPrTitle = (message) => core.error(`⛔️ PR title: ${message}`);
 exports.errorPrTitle = errorPrTitle;
 
 
@@ -113,13 +156,33 @@ exports.errorPrTitle = errorPrTitle;
 
 "use strict";
 
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.setFailedScopeNotValid = exports.setFailedDoesNotMatchSpec = exports.setFailedMissingToken = exports.setFailedPrNotFound = void 0;
-const core_1 = __importDefault(__nccwpck_require__(2186));
-const setFailed = (message) => core_1.default.setFailed(`🛑 ${message}`);
+const core = __importStar(__nccwpck_require__(2186));
+const setFailed = (message) => core.setFailed(`🛑 ${message}`);
 const setFailedPrNotFound = () => setFailed(`Pull request not found. Use pull request event to trigger this action`);
 exports.setFailedPrNotFound = setFailedPrNotFound;
 const setFailedMissingToken = () => setFailed(`Could not find Github Token. Ensure you have passed a valid 'GITHUB_TOKEN' value to the action.`);
@@ -137,13 +200,33 @@ exports.setFailedScopeNotValid = setFailedScopeNotValid;
 
 "use strict";
 
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.logPrTitleFound = void 0;
-const core_1 = __importDefault(__nccwpck_require__(2186));
-const logPrTitleFound = (title) => core_1.default.info(`Found PR title: "${title}"`);
+const core = __importStar(__nccwpck_require__(2186));
+const logPrTitleFound = (title) => core.info(`Found PR title: "${title}"`);
 exports.logPrTitleFound = logPrTitleFound;
 
 
@@ -154,17 +237,37 @@ exports.logPrTitleFound = logPrTitleFound;
 
 "use strict";
 
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.warnPrTitle = exports.warnRulesNotFound = exports.warnMissingCheckout = void 0;
-const core_1 = __importDefault(__nccwpck_require__(2186));
-const warnMissingCheckout = () => core_1.default.warning(`⚠️  actions/checkout is required to load your commitlint rules file`);
+const core = __importStar(__nccwpck_require__(2186));
+const warnMissingCheckout = () => core.warning(`⚠️  actions/checkout is required to load your commitlint rules file`);
 exports.warnMissingCheckout = warnMissingCheckout;
-const warnRulesNotFound = () => core_1.default.warning(`⚠️  Commitlint rules file not found, falling back to default @commitlint/config-conventional lint rules. Check that 'commitlintRulesPath' matches the relative path and filename of a valid commitlint rules file.`);
+const warnRulesNotFound = () => core.warning(`⚠️  Commitlint rules file not found, falling back to default @commitlint/config-conventional lint rules. Check that 'commitlintRulesPath' matches the relative path and filename of a valid commitlint rules file.`);
 exports.warnRulesNotFound = warnRulesNotFound;
-const warnPrTitle = (message) => core_1.default.warning(`⚠️  PR title: ${message}`);
+const warnPrTitle = (message) => core.warning(`⚠️  PR title: ${message}`);
 exports.warnPrTitle = warnPrTitle;
 
 
@@ -182,7 +285,8 @@ const getActionConfig = () => {
     if (process.env.INPUT_SCOPEPREFIXES) {
         try {
             const scopePrefixes = JSON.parse(process.env.INPUT_SCOPEPREFIXES.trim());
-            SCOPE_PREFIXES = scopePrefixes.length > 0 ? scopePrefixes : SCOPE_PREFIXES;
+            SCOPE_PREFIXES =
+                scopePrefixes.length > 0 ? scopePrefixes : SCOPE_PREFIXES;
         }
         catch (e) {
             console.error('Failed to extract scope prefixes', e);
