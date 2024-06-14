@@ -1,5 +1,6 @@
 module.exports = {
   rules: {
-    "subject-case": [2, "never", ["start-case", "pascal-case", "upper-case"]],
-  },
+    'subject-case': [1, 'always', ['sentence-case', 'lower-case']],
+    'body-max-line-length': [0]
+  }
 };
