@@ -1,4 +1,4 @@
-import github from '@actions/github';
+import * as github from '@actions/github';
 import commitlint from '@commitlint/lint';
 import conventionalCommitsParser from 'conventional-commits-parser';
 import { getActionConfig } from './utils/config';
