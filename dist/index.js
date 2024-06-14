@@ -182,8 +182,7 @@ const getActionConfig = () => {
     if (process.env.INPUT_SCOPEPREFIXES) {
         try {
             const scopePrefixes = JSON.parse(process.env.INPUT_SCOPEPREFIXES.trim());
-            SCOPE_PREFIXES =
-                scopePrefixes.length > 0 ? scopePrefixes : SCOPE_PREFIXES;
+            SCOPE_PREFIXES = scopePrefixes.length > 0 ? scopePrefixes : SCOPE_PREFIXES;
         }
         catch (e) {
             console.error('Failed to extract scope prefixes', e);
