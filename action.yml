@@ -2,16 +2,16 @@ name: Conventional Pull Request Action
 description: An action to lint pull request titles to the conventional commit spec with jira tickets in the scope
 author: Ben Hodgson <work@benhodgson.net>
 branding:
-  icon: 'git-pull-request'
-  color: 'green'
+  icon: "git-pull-request"
+  color: "green"
 runs:
-  using: node16
-  main: dist/index.js
+  using: "node16"
+  main: "dist/index.js"
 inputs:
   commitlintRulesPath:
-    description: 'Relative path to commitlint rules file'
+    description: "Relative path to commitlint rules file"
     required: false
-    default: './commitlint.rules.js'
+    default: "./commitlint.rules.js"
   scopePrefixes:
     description: An array as a string containing any ticket numbers that should be required in the scope; eg. '["FOO-", "BAR-"]'
     required: false
