@@ -47,19 +47,16 @@ const github = __importStar(__nccwpck_require__(5438));
 const lint_1 = __importDefault(__nccwpck_require__(7930));
 const conventional_commits_parser_1 = __importDefault(__nccwpck_require__(6528));
 const conventional_changelog_conventionalcommits_1 = __importDefault(__nccwpck_require__(8761));
-const config_1 = __nccwpck_require__(352);
 const logs_1 = __nccwpck_require__(1768);
 const fails_1 = __nccwpck_require__(9389);
 const rules_1 = __nccwpck_require__(239);
 const warnings_1 = __nccwpck_require__(5367);
 const errors_1 = __nccwpck_require__(772);
-const lint = () => __awaiter(void 0, void 0, void 0, function* () {
-    const actionConfig = (0, config_1.getActionConfig)();
-    const { GITHUB_TOKEN, SCOPE_PREFIXES } = actionConfig;
-    if (!GITHUB_TOKEN) {
+const lint = (githubToken, githubWorkspace, rulesPath, enforcedScopeTypes, scopeRegex) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!githubToken) {
         return (0, fails_1.setFailedMissingToken)();
     }
-    const octokit = github.getOctokit(GITHUB_TOKEN);
+    const octokit = github.getOctokit(githubToken);
     if (!github.context.payload.pull_request) {
         return (0, fails_1.setFailedPrNotFound)();
     }
@@ -70,7 +67,7 @@ const lint = () => __awaiter(void 0, void 0, void 0, function* () {
         pull_number: pullNumber
     });
     (0, logs_1.logPrTitleFound)(pullRequest.title);
-    const commitlintRules = yield (0, rules_1.getLintRules)(actionConfig.RULES_PATH, actionConfig.GITHUB_WORKSPACE);
+    const commitlintRules = yield (0, rules_1.getLintRules)(rulesPath, githubWorkspace);
     if (commitlintRules === rules_1.MISSING_CHECKOUT)
         return (0, warnings_1.warnMissingCheckout)();
     if (commitlintRules === rules_1.RULES_NOT_FOUND)
@@ -85,12 +82,19 @@ const lint = () => __awaiter(void 0, void 0, void 0, function* () {
     if (!lintOutput.valid) {
         return (0, fails_1.setFailedDoesNotMatchSpec)();
     }
-    const pullRequestScope = conventional_commits_parser_1.default.sync(pullRequest.title).scope;
-    if (pullRequestScope &&
-        SCOPE_PREFIXES &&
-        SCOPE_PREFIXES.length > 0 &&
-        !SCOPE_PREFIXES.some((scope) => pullRequestScope.includes(scope))) {
-        return (0, fails_1.setFailedScopeNotValid)(SCOPE_PREFIXES);
+    const { scope, type } = conventional_commits_parser_1.default.sync(pullRequest.title);
+    if (!enforcedScopeTypes ||
+        (enforcedScopeTypes && type && enforcedScopeTypes.includes(type))) {
+        if (enforcedScopeTypes && !scope) {
+            return (0, fails_1.setFailedScopeRequired)(type);
+        }
+        if (scope && scopeRegex && !scope.match(scopeRegex)) {
+            return (0, fails_1.setFailedScopeNotValid)(scopeRegex.toString());
+        }
+    }
+    else {
+        if (type)
+            (0, logs_1.logScopeCheckSkipped)(type);
     }
     return (0, logs_1.logActionSuccessful)(hasWarnings);
 });
@@ -110,8 +114,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __importDefault(__nccwpck_require__(2186));
 const lint_1 = __nccwpck_require__(8530);
+const config_1 = __nccwpck_require__(352);
 try {
-    (0, lint_1.lint)();
+    const { githubToken, githubWorkspace, rulesPath, enforcedScopeTypes, scopeRegex } = (0, config_1.getActionConfig)();
+    (0, lint_1.lint)(githubToken, githubWorkspace, rulesPath, enforcedScopeTypes, scopeRegex);
 }
 catch (e) {
     core_1.default.setFailed(`Failed to run action with error: ${JSON.stringify(e)}`);
@@ -186,7 +192,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.setFailedScopeNotValid = exports.setFailedDoesNotMatchSpec = exports.setFailedMissingToken = exports.setFailedPrNotFound = void 0;
+exports.setFailedScopeNotValid = exports.setFailedScopeRequired = exports.setFailedDoesNotMatchSpec = exports.setFailedMissingToken = exports.setFailedPrNotFound = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const setFailed = (message) => core.setFailed(`🛑 ${message}`);
 const setFailedPrNotFound = () => setFailed(`Pull request not found. Use pull request event to trigger this action`);
@@ -195,7 +201,9 @@ const setFailedMissingToken = () => setFailed(`Could not find Github Token. Ensu
 exports.setFailedMissingToken = setFailedMissingToken;
 const setFailedDoesNotMatchSpec = () => setFailed(`Pull request title does not conform to the conventional commit spec`);
 exports.setFailedDoesNotMatchSpec = setFailedDoesNotMatchSpec;
-const setFailedScopeNotValid = (scopes) => setFailed(`PR title must contain a scope with a ticket number containing one of ${scopes.join(', ')}`);
+const setFailedScopeRequired = (type) => setFailed(`PR title${type ? ` of type '${type.toString()}'` : ''} must contain a scope`);
+exports.setFailedScopeRequired = setFailedScopeRequired;
+const setFailedScopeNotValid = (regex) => setFailed(`PR title must contain a scope which matches the regular expression: ${regex}`);
 exports.setFailedScopeNotValid = setFailedScopeNotValid;
 
 
@@ -230,12 +238,14 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.logActionSuccessful = exports.logPrTitleFound = void 0;
+exports.logScopeCheckSkipped = exports.logActionSuccessful = exports.logPrTitleFound = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const logPrTitleFound = (title) => core.info(`🕵️  Found PR title: "${title}"`);
 exports.logPrTitleFound = logPrTitleFound;
 const logActionSuccessful = (hasWarnings = false) => core.info(`✅ PR title validated ${hasWarnings ? 'with warnings' : 'successfully'}`);
 exports.logActionSuccessful = logActionSuccessful;
+const logScopeCheckSkipped = (type) => core.info(`⏩ Skipping scope check for type '${type}'`);
+exports.logScopeCheckSkipped = logScopeCheckSkipped;
 
 
 /***/ }),
@@ -289,23 +299,27 @@ exports.warnPrTitle = warnPrTitle;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getActionConfig = void 0;
 const getActionConfig = () => {
-    let SCOPE_PREFIXES = [];
-    if (process.env.INPUT_SCOPEPREFIXES) {
+    let enforcedScopeTypes;
+    let scopeRegex;
+    if (process.env.INPUT_ENFORCEDSCOPETYPES) {
         try {
-            const scopePrefixes = JSON.parse(process.env.INPUT_SCOPEPREFIXES.trim());
-            SCOPE_PREFIXES =
-                scopePrefixes.length > 0 ? scopePrefixes : SCOPE_PREFIXES;
+            const types = process.env.INPUT_ENFORCEDSCOPETYPES.split('|');
+            enforcedScopeTypes = types.length > 0 ? types : undefined;
         }
         catch (e) {
-            console.error('Failed to extract scope prefixes', e);
+            console.error('Failed to convert scopeRegex to valid RegExp', e);
         }
     }
-    return {
-        SCOPE_PREFIXES,
-        RULES_PATH: process.env.INPUT_COMMITLINTRULESPATH,
-        GITHUB_TOKEN: process.env.GITHUB_TOKEN,
-        GITHUB_WORKSPACE: process.env.GITHUB_WORKSPACE
-    };
+    if (process.env.INPUT_SCOPEREGEX) {
+        try {
+            const regex = new RegExp(process.env.INPUT_SCOPEREGEX, 'g');
+            scopeRegex = regex ? regex : undefined;
+        }
+        catch (e) {
+            console.error('Failed to convert scopeRegex to valid RegExp', e);
+        }
+    }
+    return Object.assign(Object.assign({ githubToken: process.env.GITHUB_TOKEN, githubWorkspace: process.env.GITHUB_WORKSPACE, rulesPath: process.env.INPUT_COMMITLINTRULESPATH }, (enforcedScopeTypes ? { enforcedScopeTypes } : {})), (scopeRegex ? { scopeRegex } : {}));
 };
 exports.getActionConfig = getActionConfig;
 

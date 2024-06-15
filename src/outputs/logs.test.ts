@@ -1,6 +1,10 @@
 import { info } from '@actions/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { logActionSuccessful, logPrTitleFound } from './logs';
+import {
+  logActionSuccessful,
+  logPrTitleFound,
+  logScopeCheckSkipped
+} from './logs';
 
 vi.mock('@actions/core', async importOriginal => {
   const mod = await importOriginal<typeof import('@actions/core')>();
@@ -32,5 +36,12 @@ describe('Log outputs', () => {
   it('`logActionSuccessful` should log the success message when `hasWarnings` is false', () => {
     logActionSuccessful(true);
     expect(info).toHaveBeenCalledWith(`✅ PR title validated with warnings`);
+  });
+
+  it('`logScopeCheckSkipped` should pass the expected log to the output', () => {
+    logScopeCheckSkipped('chore');
+    expect(info).toHaveBeenCalledWith(
+      `⏩ Skipping scope check for type 'chore'`
+    );
   });
 });

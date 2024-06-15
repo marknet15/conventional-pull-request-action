@@ -2,13 +2,17 @@ import * as github from '@actions/github';
 import commitlint from '@commitlint/lint';
 import conventionalCommitsParser from 'conventional-commits-parser';
 import createPreset from 'conventional-changelog-conventionalcommits';
-import { getActionConfig } from './utils/config';
-import { logActionSuccessful, logPrTitleFound } from './outputs/logs';
+import {
+  logActionSuccessful,
+  logPrTitleFound,
+  logScopeCheckSkipped
+} from './outputs/logs';
 import {
   setFailedDoesNotMatchSpec,
   setFailedMissingToken,
   setFailedPrNotFound,
-  setFailedScopeNotValid
+  setFailedScopeNotValid,
+  setFailedScopeRequired
 } from './outputs/fails';
 import { getLintRules, MISSING_CHECKOUT, RULES_NOT_FOUND } from './utils/rules';
 import {
@@ -18,15 +22,18 @@ import {
 } from './outputs/warnings';
 import { errorPrTitle } from './outputs/errors';
 
-const lint = async () => {
-  const actionConfig = getActionConfig();
-  const { GITHUB_TOKEN, SCOPE_PREFIXES } = actionConfig;
-
-  if (!GITHUB_TOKEN) {
+const lint = async (
+  githubToken?: string,
+  githubWorkspace?: string,
+  rulesPath?: string,
+  enforcedScopeTypes?: Array<string>,
+  scopeRegex?: RegExp
+) => {
+  if (!githubToken) {
     return setFailedMissingToken();
   }
 
-  const octokit = github.getOctokit(GITHUB_TOKEN);
+  const octokit = github.getOctokit(githubToken);
 
   if (!github.context.payload.pull_request) {
     return setFailedPrNotFound();
@@ -48,10 +55,7 @@ const lint = async () => {
 
   logPrTitleFound(pullRequest.title);
 
-  const commitlintRules = await getLintRules(
-    actionConfig.RULES_PATH,
-    actionConfig.GITHUB_WORKSPACE
-  );
+  const commitlintRules = await getLintRules(rulesPath, githubWorkspace);
 
   if (commitlintRules === MISSING_CHECKOUT) return warnMissingCheckout();
   if (commitlintRules === RULES_NOT_FOUND) return warnRulesNotFound();
@@ -72,17 +76,21 @@ const lint = async () => {
     return setFailedDoesNotMatchSpec();
   }
 
-  const pullRequestScope = conventionalCommitsParser.sync(
-    pullRequest.title
-  ).scope;
+  const { scope, type } = conventionalCommitsParser.sync(pullRequest.title);
 
   if (
-    pullRequestScope &&
-    SCOPE_PREFIXES &&
-    SCOPE_PREFIXES.length > 0 &&
-    !SCOPE_PREFIXES.some((scope: string) => pullRequestScope.includes(scope))
+    !enforcedScopeTypes ||
+    (enforcedScopeTypes && type && enforcedScopeTypes.includes(type))
   ) {
-    return setFailedScopeNotValid(SCOPE_PREFIXES);
+    if (enforcedScopeTypes && !scope) {
+      return setFailedScopeRequired(type);
+    }
+
+    if (scope && scopeRegex && !scope.match(scopeRegex)) {
+      return setFailedScopeNotValid(scopeRegex.toString());
+    }
+  } else {
+    if (type) logScopeCheckSkipped(type);
   }
 
   return logActionSuccessful(hasWarnings);

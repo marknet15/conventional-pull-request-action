@@ -1,5 +1,5 @@
 import { setFailed, warning, error, info } from '@actions/core';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { lint } from './lint';
 
 const mocks = vi.hoisted(() => {
@@ -49,16 +49,12 @@ vi.mock('@actions/github', async importOriginal => {
   };
 });
 
+const mockArgs = ['TOKEN', './', './src/fixtures/commitlint.rules.js'];
+
 describe('Linter', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.restoreAllMocks();
-
-    delete process.env.INPUT_SCOPEPREFIXES;
-    process.env.INPUT_COMMITLINTRULESPATH =
-      './src/fixtures/commitlint.rules.js';
-    process.env.GITHUB_TOKEN = 'TOKEN';
-    process.env.GITHUB_WORKSPACE = './';
   });
 
   it('should find and log the PR title', async () => {
@@ -75,14 +71,18 @@ describe('Linter', () => {
       }
     });
 
-    await lint();
+    await lint.apply(null, mockArgs);
 
     expect(info).toHaveBeenCalledWith(
       '🕵️  Found PR title: "feat(BAR-1234): hello i am a valid title"'
     );
   });
 
-  it.each(['feat(BAR-1234): subject is valid', 'feat!: subject is valid'])(
+  it.each([
+    'fix: subject is valid',
+    'feat(BAR-1234): subject is valid',
+    'feat!: subject is valid'
+  ])(
     'should output a success message if PR title is valid: %s',
     async title => {
       mocks.getOctokit.mockReturnValue({
@@ -98,7 +98,7 @@ describe('Linter', () => {
         }
       });
 
-      await lint();
+      await lint.apply(null, mockArgs);
 
       expect(info).toHaveBeenLastCalledWith(
         '✅ PR title validated successfully'
@@ -109,6 +109,28 @@ describe('Linter', () => {
       expect(setFailed).not.toHaveBeenCalled();
     }
   );
+
+  it('should fail and output an error if title does not have a type', async () => {
+    mocks.getOctokit.mockReturnValue({
+      rest: {
+        pulls: {
+          get: vi.fn().mockReturnValue({
+            data: {
+              commits: 1,
+              title: 'this is not a conventional commit'
+            }
+          })
+        }
+      }
+    });
+
+    await lint.apply(null, mockArgs);
+
+    expect(error).toHaveBeenCalledWith('⛔️ PR title: type may not be empty');
+    expect(setFailed).toHaveBeenCalledWith(
+      '🛑 Pull request title does not conform to the conventional commit spec'
+    );
+  });
 
   it('should fail and output an error if title does not pass a custom error rule', async () => {
     mocks.getOctokit.mockReturnValue({
@@ -124,7 +146,7 @@ describe('Linter', () => {
       }
     });
 
-    await lint();
+    await lint.apply(null, mockArgs);
 
     expect(error).toHaveBeenCalledWith(
       '⛔️ PR title: subject must be lower-case'
@@ -149,7 +171,7 @@ describe('Linter', () => {
       }
     });
 
-    await lint();
+    await lint.apply(null, mockArgs);
 
     expect(warning).toHaveBeenCalledWith(
       '⚠️  PR title: subject must not be longer than 20 characters'
@@ -160,9 +182,7 @@ describe('Linter', () => {
     expect(setFailed).not.toHaveBeenCalled();
   });
 
-  it('should fail if the title is a valid conventional commit but a required scope is expected', async () => {
-    process.env.INPUT_SCOPEPREFIXES = `["FOO-"]`;
-
+  it('should fail if the title is a valid conventional commit but a correct scope pattern is missing', async () => {
     mocks.getOctokit.mockReturnValue({
       rest: {
         pulls: {
@@ -170,17 +190,124 @@ describe('Linter', () => {
             data: {
               commits: 1,
               title:
-                'feat(BAR-1234): subject should not be longer than 20 characters long'
+                'feat(QUX-1234): subject should not be longer than 20 characters long'
             }
           })
         }
       }
     });
 
-    await lint();
+    await lint.apply(null, [
+      ...mockArgs,
+      undefined,
+      new RegExp(`\\b(FOO|BAR|BAZ)\\b-[0-9]+`, 'g')
+    ]);
 
     expect(setFailed).toHaveBeenCalledWith(
-      '🛑 PR title must contain a scope with a ticket number containing one of FOO-'
+      '🛑 PR title must contain a scope which matches the regular expression: /\\b(FOO|BAR|BAZ)\\b-[0-9]+/g'
+    );
+  });
+
+  it('should pass if the title is a valid conventional commit and a correct scope pattern is present', async () => {
+    mocks.getOctokit.mockReturnValue({
+      rest: {
+        pulls: {
+          get: vi.fn().mockReturnValue({
+            data: {
+              commits: 1,
+              title:
+                'feat(FOO-123): subject should not be longer than 20 characters long'
+            }
+          })
+        }
+      }
+    });
+
+    await lint.apply(null, [
+      ...mockArgs,
+      undefined,
+      new RegExp(`\\b(FOO|BAR|BAZ)\\b-[0-9]+`, 'g')
+    ]);
+
+    expect(setFailed).not.toHaveBeenCalled();
+  });
+
+  it('should pass if the title is a valid conventional commit and a correct scope pattern is present for a required type', async () => {
+    mocks.getOctokit.mockReturnValue({
+      rest: {
+        pulls: {
+          get: vi.fn().mockReturnValue({
+            data: {
+              commits: 1,
+              title:
+                'feat(FOO-123): subject should not be longer than 20 characters long'
+            }
+          })
+        }
+      }
+    });
+
+    await lint.apply(null, [
+      ...mockArgs,
+      ['feat', 'fix'],
+      new RegExp(`\\b(FOO|BAR|BAZ)\\b-[0-9]+`, 'g')
+    ]);
+
+    expect(info).toHaveBeenLastCalledWith(
+      '✅ PR title validated with warnings'
+    );
+    expect(setFailed).not.toHaveBeenCalled();
+  });
+
+  it('should pass if the title is a valid conventional commit and type is omitted from scope checks', async () => {
+    mocks.getOctokit.mockReturnValue({
+      rest: {
+        pulls: {
+          get: vi.fn().mockReturnValue({
+            data: {
+              commits: 1,
+              title: 'chore: valid subject'
+            }
+          })
+        }
+      }
+    });
+
+    await lint.apply(null, [
+      ...mockArgs,
+      ['feat', 'fix'],
+      new RegExp(`\\b(FOO|BAR|BAZ)\\b-[0-9]+`, 'g')
+    ]);
+
+    expect(info).toHaveBeenCalledWith(
+      `⏩ Skipping scope check for type 'chore'`
+    );
+    expect(info).toHaveBeenLastCalledWith('✅ PR title validated successfully');
+    expect(setFailed).not.toHaveBeenCalled();
+  });
+
+  it('should fail if the title is a valid conventional commit but scope is missing for a required type', async () => {
+    mocks.getOctokit.mockReturnValue({
+      rest: {
+        pulls: {
+          get: vi.fn().mockReturnValue({
+            data: {
+              commits: 1,
+              title: 'chore: subject is valid'
+            }
+          })
+        }
+      }
+    });
+
+    await lint.apply(null, [
+      ...mockArgs,
+      ['feat', 'fix', 'chore'],
+      new RegExp(`\\b(FOO|BAR|BAZ)\\b-[0-9]+`, 'g')
+    ]);
+
+    expect(setFailed).toHaveBeenCalledWith(
+      `🛑 PR title of type 'chore' must contain a scope`
     );
   });
 });

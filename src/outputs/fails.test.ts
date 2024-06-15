@@ -4,7 +4,8 @@ import {
   setFailedPrNotFound,
   setFailedMissingToken,
   setFailedDoesNotMatchSpec,
-  setFailedScopeNotValid
+  setFailedScopeNotValid,
+  setFailedScopeRequired
 } from './fails';
 
 vi.mock('@actions/core', async importOriginal => {
@@ -43,10 +44,22 @@ describe('Failure outputs', () => {
     );
   });
 
-  it('`setFailedDoesNotMatchSpec` should pass the expected error to the output with given arguments', () => {
-    setFailedScopeNotValid(['SCARY-', 'SPORTY-', 'BABY-', 'GINGER-', 'POSH-']);
+  it('`setFailedScopeRequired` should pass the expected error to the output with no arguments', () => {
+    setFailedScopeRequired();
+    expect(setFailed).toHaveBeenCalledWith(`🛑 PR title must contain a scope`);
+  });
+
+  it('`setFailedScopeRequired` should pass the expected error to the output with given arguments', () => {
+    setFailedScopeRequired('feat');
     expect(setFailed).toHaveBeenCalledWith(
-      `🛑 PR title must contain a scope with a ticket number containing one of SCARY-, SPORTY-, BABY-, GINGER-, POSH-`
+      `🛑 PR title of type 'feat' must contain a scope`
+    );
+  });
+
+  it('`setFailedDoesNotMatchSpec` should pass the expected error to the output with given arguments', () => {
+    setFailedScopeNotValid('/needle/g');
+    expect(setFailed).toHaveBeenCalledWith(
+      `🛑 PR title must contain a scope which matches the regular expression: /needle/g`
     );
   });
 });

@@ -7,3 +7,6 @@ export const logActionSuccessful = (hasWarnings: boolean = false) =>
   core.info(
     `✅ PR title validated ${hasWarnings ? 'with warnings' : 'successfully'}`
   );
+
+export const logScopeCheckSkipped = (type: string) =>
+  core.info(`⏩ Skipping scope check for type '${type}'`);

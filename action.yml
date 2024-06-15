@@ -2,16 +2,19 @@ name: Conventional Pull Request Action
 description: An action to lint pull request titles to the conventional commit spec with jira tickets in the scope
 author: Ben Hodgson <work@benhodgson.net>
 branding:
-  icon: "git-pull-request"
-  color: "green"
+  icon: 'git-pull-request'
+  color: 'green'
 runs:
-  using: "node16"
-  main: "dist/index.js"
+  using: 'node16'
+  main: 'dist/index.js'
 inputs:
   commitlintRulesPath:
-    description: "Relative path to commitlint rules file"
+    description: 'Relative path to commitlint rules file'
     required: false
-    default: "./commitlint.rules.js"
-  scopePrefixes:
-    description: An array as a string containing any ticket numbers that should be required in the scope; eg. '["FOO-", "BAR-"]'
+    default: './commitlint.rules.js'
+  enforcedScopeTypes:
+    description: A list of PR types that will trigger the scopeRegex function to run. eg `feat|fix` will allow 'chore' PRs to skip the regex scope check. If left empty, all types will trigger the scope check.
+    required: false
+  scopeRegex:
+    description: A JS Regular Expression that the scope value must conform to; eg. '\\b(FOO|BAR|BAZ)\\b-[0-9]+' to require a Jira ticket with a specific project ID. DO NOT include leading or trailing slashes, or flags. These are added when the regex arg is converted to a RegExp.
     required: false

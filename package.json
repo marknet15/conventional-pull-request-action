@@ -10,7 +10,7 @@
     "build": "tsc",
     "package": "ncc build --source-map --license licenses.txt",
     "all": "npm run build && npm run package",
-    "format:write": "prettier --write '**/*.ts'",
+    "format:fix": "prettier --write '**/*.ts'",
     "format:check": "prettier --check '**/*.ts'"
   },
   "dependencies": {
