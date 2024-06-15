@@ -1,6 +1,7 @@
 import * as github from '@actions/github';
 import commitlint from '@commitlint/lint';
 import conventionalCommitsParser from 'conventional-commits-parser';
+import createPreset from 'conventional-changelog-conventionalcommits';
 import { getActionConfig } from './utils/config';
 import { logActionSuccessful, logPrTitleFound } from './outputs/logs';
 import {
@@ -55,7 +56,13 @@ const lint = async () => {
   if (commitlintRules === MISSING_CHECKOUT) return warnMissingCheckout();
   if (commitlintRules === RULES_NOT_FOUND) return warnRulesNotFound();
 
-  const lintOutput = await commitlint(pullRequest.title, commitlintRules);
+  const {
+    conventionalChangelog: { parserOpts }
+  } = await createPreset(null, null);
+
+  const lintOutput = await commitlint(pullRequest.title, commitlintRules, {
+    parserOpts
+  });
   lintOutput.warnings.forEach(warn => warnPrTitle(warn.message));
   lintOutput.errors.forEach(err => errorPrTitle(err.message));
 
