@@ -78,8 +78,31 @@ describe('Linter', () => {
     await lint();
 
     expect(info).toHaveBeenCalledWith(
-      'Found PR title: "feat(BAR-1234): hello i am a valid title"'
+      '🕵️  Found PR title: "feat(BAR-1234): hello i am a valid title"'
     );
+  });
+
+  it('should output a success message if PR title is valid', async () => {
+    mocks.getOctokit.mockReturnValue({
+      rest: {
+        pulls: {
+          get: vi.fn().mockReturnValue({
+            data: {
+              commits: 1,
+              title: 'feat(BAR-1234): subject is valid'
+            }
+          })
+        }
+      }
+    });
+
+    await lint();
+
+    expect(info).toHaveBeenCalledWith('✅ PR title validated successfully');
+
+    expect(error).not.toHaveBeenCalled();
+    expect(warning).not.toHaveBeenCalled();
+    expect(setFailed).not.toHaveBeenCalled();
   });
 
   it('should fail and output an error if title does not pass a custom error rule', async () => {
@@ -126,6 +149,7 @@ describe('Linter', () => {
     expect(warning).toHaveBeenCalledWith(
       '⚠️  PR title: subject must not be longer than 20 characters'
     );
+    expect(info).toHaveBeenCalledWith('✅ PR title validated with warnings');
     expect(setFailed).not.toHaveBeenCalled();
   });
 

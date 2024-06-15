@@ -2,7 +2,7 @@ import * as github from '@actions/github';
 import commitlint from '@commitlint/lint';
 import conventionalCommitsParser from 'conventional-commits-parser';
 import { getActionConfig } from './utils/config';
-import { logPrTitleFound } from './outputs/logs';
+import { logActionSuccessful, logPrTitleFound } from './outputs/logs';
 import {
   setFailedDoesNotMatchSpec,
   setFailedMissingToken,
@@ -59,6 +59,8 @@ const lint = async () => {
   lintOutput.warnings.forEach(warn => warnPrTitle(warn.message));
   lintOutput.errors.forEach(err => errorPrTitle(err.message));
 
+  const hasWarnings = lintOutput.warnings.length > 0;
+
   if (!lintOutput.valid) {
     return setFailedDoesNotMatchSpec();
   }
@@ -75,6 +77,8 @@ const lint = async () => {
   ) {
     return setFailedScopeNotValid(SCOPE_PREFIXES);
   }
+
+  return logActionSuccessful(hasWarnings);
 };
 
 export { lint };
