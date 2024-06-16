@@ -26,7 +26,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Lint PR Title
-        uses: benhodgson87/conventional-pull-request-action@v2.0.0
+        uses: benhodgson87/conventional-pull-request-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
