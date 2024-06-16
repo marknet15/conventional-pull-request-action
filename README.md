@@ -118,10 +118,15 @@ enforcedScopeTypes: 'feat|fix'
 With the above config, using the example regex string in the previous section;
 
 > ✅ feat(BAR-1234): This PR title is ok
+
 > ✅ fix(FOO-2345): This PR title is also ok
+
 > ✅ chore: This PR title is ok too, as chore is not an enforced type
+
 > 🚫 feat: This is a feature PR so requires a ticket in the scope
+
 > 🚫 fix(FOO-): The regex also expects the ticket number
+
 > 🚫 feat(ci): This scope doesn't match the permitted regex
 
 ### Skipping for bot PRs
