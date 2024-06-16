@@ -40,7 +40,7 @@ jobs:
 | --------------------- | -------- | ------------------------- | ------------------------------------------------------------------------------------------------------- |
 | `commitlintRulesPath` | No       | `'./commitlint.rules.js'` | A relative path from the repo root to a file containing custom Commitlint rules to override the default |
 | `scopeRegex`          | No       | `'[A-Z]+-[0-9]+'`         | A JS regex (without slashes or flags) used to lint the PR scope                                         |
-| `enforcedScopeType`s  | No       | `'feat\|fix'`             | A list of PR types where the scope is always required and linted                                        |
+| `enforcedScopeTypes`  | No       | `'feat\|fix'`             | A list of PR types where the scope is always required and linted                                        |
 
 ## Usage
 
@@ -117,12 +117,12 @@ enforcedScopeTypes: 'feat|fix'
 
 With the above config, using the example regex string in the previous section;
 
-- > ✅ feat(BAR-1234): This PR title is ok
-- > ✅ fix(FOO-2345): This PR title is also ok
-- > ✅ chore: This PR title is ok too, as chore is not an enforced type
-- > 🚫 feat: This is a feature PR so requires a ticket in the scope
-- > 🚫 fix(FOO-): The regex also expects the ticket number
-- > 🚫 feat(ci): This scope doesn't match the permitted regex
+> ✅ feat(BAR-1234): This PR title is ok
+> ✅ fix(FOO-2345): This PR title is also ok
+> ✅ chore: This PR title is ok too, as chore is not an enforced type
+> 🚫 feat: This is a feature PR so requires a ticket in the scope
+> 🚫 fix(FOO-): The regex also expects the ticket number
+> 🚫 feat(ci): This scope doesn't match the permitted regex
 
 ### Skipping for bot PRs
 
