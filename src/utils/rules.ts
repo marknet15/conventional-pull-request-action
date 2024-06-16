@@ -3,13 +3,16 @@ import config from '@commitlint/config-conventional';
 import { warnRulesNotFound } from '../outputs/warnings';
 
 export const MISSING_CHECKOUT = 'MISSING_CHECKOUT';
-export const RULES_NOT_FOUND = 'RULES_NOT_FOUND';
+export const MISSING_RULES_FILE = 'MISSING_RULES_FILE';
 
 export const getLintRules = async (rules?: string, workspace?: string) => {
   let overrideRules = {};
 
   if (rules && !workspace) {
-    return MISSING_CHECKOUT;
+    return {
+      error: MISSING_CHECKOUT,
+      rules: { ...config.rules, ...overrideRules }
+    };
   } else if (rules && workspace) {
     const configPath = path.resolve(workspace, rules);
     try {
@@ -24,12 +27,17 @@ export const getLintRules = async (rules?: string, workspace?: string) => {
         typeof e.code === 'string' &&
         e.code === 'MODULE_NOT_FOUND'
       ) {
-        warnRulesNotFound();
-        return config.rules;
+        return {
+          error: MISSING_RULES_FILE,
+          rules: { ...config.rules, ...overrideRules }
+        };
       } else {
         throw e;
       }
     }
   }
-  return { ...config.rules, ...overrideRules };
+
+  return {
+    rules: { ...config.rules, ...overrideRules }
+  };
 };

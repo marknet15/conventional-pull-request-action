@@ -24,14 +24,14 @@ describe('Warning outputs', () => {
   it('`warnMissingCheckout` should pass the expected error to the output', () => {
     warnMissingCheckout();
     expect(warning).toHaveBeenCalledWith(
-      `⚠️  actions/checkout is required to load your commitlint rules file`
+      `⚠️  actions/checkout is required to load a custom commitlint rules file. Falling back to default @commitlint/config-conventional lint rules.`
     );
   });
 
   it('`warnRulesNotFound` should pass the expected error to the output', () => {
     warnRulesNotFound();
     expect(warning).toHaveBeenCalledWith(
-      `⚠️  Commitlint rules file not found, falling back to default @commitlint/config-conventional lint rules. Check that 'commitlintRulesPath' matches the relative path and filename of a valid commitlint rules file.`
+      `⚠️  Commitlint rules file not found, falling back to default @commitlint/config-conventional lint rules. If using custom rules, check that 'commitlintRulesPath' matches the relative path and filename of a valid commitlint rules file.`
     );
   });
 

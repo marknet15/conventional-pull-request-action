@@ -14,7 +14,11 @@ import {
   setFailedScopeNotValid,
   setFailedScopeRequired
 } from './outputs/fails';
-import { getLintRules, MISSING_CHECKOUT, RULES_NOT_FOUND } from './utils/rules';
+import {
+  getLintRules,
+  MISSING_CHECKOUT,
+  MISSING_RULES_FILE
+} from './utils/rules';
 import {
   warnMissingCheckout,
   warnPrTitle,
@@ -57,15 +61,20 @@ const lint = async (
 
   const commitlintRules = await getLintRules(rulesPath, githubWorkspace);
 
-  if (commitlintRules === MISSING_CHECKOUT) return warnMissingCheckout();
+  if (commitlintRules.error === MISSING_CHECKOUT) warnMissingCheckout();
+  if (commitlintRules.error === MISSING_RULES_FILE) warnRulesNotFound();
 
   const {
     conventionalChangelog: { parserOpts }
   } = await createPreset(null, null);
 
-  const lintOutput = await commitlint(pullRequest.title, commitlintRules, {
-    parserOpts
-  });
+  const lintOutput = await commitlint(
+    pullRequest.title,
+    commitlintRules.rules,
+    {
+      parserOpts
+    }
+  );
   lintOutput.warnings.forEach(warn => warnPrTitle(warn.message));
   lintOutput.errors.forEach(err => errorPrTitle(err.message));
 

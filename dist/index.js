@@ -68,10 +68,12 @@ const lint = (githubToken, githubWorkspace, rulesPath, enforcedScopeTypes, scope
     });
     (0, logs_1.logPrTitleFound)(pullRequest.title);
     const commitlintRules = yield (0, rules_1.getLintRules)(rulesPath, githubWorkspace);
-    if (commitlintRules === rules_1.MISSING_CHECKOUT)
-        return (0, warnings_1.warnMissingCheckout)();
+    if (commitlintRules.error === rules_1.MISSING_CHECKOUT)
+        (0, warnings_1.warnMissingCheckout)();
+    if (commitlintRules.error === rules_1.MISSING_RULES_FILE)
+        (0, warnings_1.warnRulesNotFound)();
     const { conventionalChangelog: { parserOpts } } = yield (0, conventional_changelog_conventionalcommits_1.default)(null, null);
-    const lintOutput = yield (0, lint_1.default)(pullRequest.title, commitlintRules, {
+    const lintOutput = yield (0, lint_1.default)(pullRequest.title, commitlintRules.rules, {
         parserOpts
     });
     lintOutput.warnings.forEach(warn => (0, warnings_1.warnPrTitle)(warn.message));
@@ -279,9 +281,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.warnPrTitle = exports.warnRulesNotFound = exports.warnMissingCheckout = void 0;
 const core = __importStar(__nccwpck_require__(2186));
-const warnMissingCheckout = () => core.warning(`⚠️  actions/checkout is required to load your commitlint rules file`);
+const warnMissingCheckout = () => core.warning(`⚠️  actions/checkout is required to load a custom commitlint rules file. Falling back to default @commitlint/config-conventional lint rules.`);
 exports.warnMissingCheckout = warnMissingCheckout;
-const warnRulesNotFound = () => core.warning(`⚠️  Commitlint rules file not found, falling back to default @commitlint/config-conventional lint rules. Check that 'commitlintRulesPath' matches the relative path and filename of a valid commitlint rules file.`);
+const warnRulesNotFound = () => core.warning(`⚠️  Commitlint rules file not found, falling back to default @commitlint/config-conventional lint rules. If using custom rules, check that 'commitlintRulesPath' matches the relative path and filename of a valid commitlint rules file.`);
 exports.warnRulesNotFound = warnRulesNotFound;
 const warnPrTitle = (message) => core.warning(`⚠️  PR title: ${message}`);
 exports.warnPrTitle = warnPrTitle;
@@ -342,16 +344,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getLintRules = exports.RULES_NOT_FOUND = exports.MISSING_CHECKOUT = void 0;
+exports.getLintRules = exports.MISSING_RULES_FILE = exports.MISSING_CHECKOUT = void 0;
 const path_1 = __importDefault(__nccwpck_require__(1017));
 const config_conventional_1 = __importDefault(__nccwpck_require__(1409));
-const warnings_1 = __nccwpck_require__(5367);
 exports.MISSING_CHECKOUT = 'MISSING_CHECKOUT';
-exports.RULES_NOT_FOUND = 'RULES_NOT_FOUND';
+exports.MISSING_RULES_FILE = 'MISSING_RULES_FILE';
 const getLintRules = (rules, workspace) => __awaiter(void 0, void 0, void 0, function* () {
     let overrideRules = {};
     if (rules && !workspace) {
-        return exports.MISSING_CHECKOUT;
+        return {
+            error: exports.MISSING_CHECKOUT,
+            rules: Object.assign(Object.assign({}, config_conventional_1.default.rules), overrideRules)
+        };
     }
     else if (rules && workspace) {
         const configPath = path_1.default.resolve(workspace, rules);
@@ -366,15 +370,19 @@ const getLintRules = (rules, workspace) => __awaiter(void 0, void 0, void 0, fun
                 'code' in e &&
                 typeof e.code === 'string' &&
                 e.code === 'MODULE_NOT_FOUND') {
-                (0, warnings_1.warnRulesNotFound)();
-                return config_conventional_1.default.rules;
+                return {
+                    error: exports.MISSING_RULES_FILE,
+                    rules: Object.assign(Object.assign({}, config_conventional_1.default.rules), overrideRules)
+                };
             }
             else {
                 throw e;
             }
         }
     }
-    return Object.assign(Object.assign({}, config_conventional_1.default.rules), overrideRules);
+    return {
+        rules: Object.assign(Object.assign({}, config_conventional_1.default.rules), overrideRules)
+    };
 });
 exports.getLintRules = getLintRules;
 
