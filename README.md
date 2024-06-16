@@ -21,6 +21,7 @@ jobs:
   pr-lint:
     runs-on: ubuntu-latest
     steps:
+      # Note: The repo checkout step is only required if using a custom commitlintRulesPath file
       - name: Check Out
         uses: actions/checkout@v4
 
