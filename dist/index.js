@@ -70,8 +70,6 @@ const lint = (githubToken, githubWorkspace, rulesPath, enforcedScopeTypes, scope
     const commitlintRules = yield (0, rules_1.getLintRules)(rulesPath, githubWorkspace);
     if (commitlintRules === rules_1.MISSING_CHECKOUT)
         return (0, warnings_1.warnMissingCheckout)();
-    if (commitlintRules === rules_1.RULES_NOT_FOUND)
-        return (0, warnings_1.warnRulesNotFound)();
     const { conventionalChangelog: { parserOpts } } = yield (0, conventional_changelog_conventionalcommits_1.default)(null, null);
     const lintOutput = yield (0, lint_1.default)(pullRequest.title, commitlintRules, {
         parserOpts
@@ -347,6 +345,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getLintRules = exports.RULES_NOT_FOUND = exports.MISSING_CHECKOUT = void 0;
 const path_1 = __importDefault(__nccwpck_require__(1017));
 const config_conventional_1 = __importDefault(__nccwpck_require__(1409));
+const warnings_1 = __nccwpck_require__(5367);
 exports.MISSING_CHECKOUT = 'MISSING_CHECKOUT';
 exports.RULES_NOT_FOUND = 'RULES_NOT_FOUND';
 const getLintRules = (rules, workspace) => __awaiter(void 0, void 0, void 0, function* () {
@@ -367,7 +366,8 @@ const getLintRules = (rules, workspace) => __awaiter(void 0, void 0, void 0, fun
                 'code' in e &&
                 typeof e.code === 'string' &&
                 e.code === 'MODULE_NOT_FOUND') {
-                return exports.RULES_NOT_FOUND;
+                (0, warnings_1.warnRulesNotFound)();
+                return config_conventional_1.default.rules;
             }
             else {
                 throw e;

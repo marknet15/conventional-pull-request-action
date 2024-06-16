@@ -1,5 +1,6 @@
 import path from 'path';
 import config from '@commitlint/config-conventional';
+import { warnRulesNotFound } from '../outputs/warnings';
 
 export const MISSING_CHECKOUT = 'MISSING_CHECKOUT';
 export const RULES_NOT_FOUND = 'RULES_NOT_FOUND';
@@ -23,7 +24,8 @@ export const getLintRules = async (rules?: string, workspace?: string) => {
         typeof e.code === 'string' &&
         e.code === 'MODULE_NOT_FOUND'
       ) {
-        return RULES_NOT_FOUND;
+        warnRulesNotFound();
+        return config.rules;
       } else {
         throw e;
       }
