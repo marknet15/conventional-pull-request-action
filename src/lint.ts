@@ -62,7 +62,8 @@ const lint = async (
   const commitlintRules = await getLintRules(rulesPath, githubWorkspace);
 
   if (commitlintRules.error === MISSING_CHECKOUT) warnMissingCheckout();
-  if (commitlintRules.error === MISSING_RULES_FILE) warnRulesNotFound();
+  if (commitlintRules.error === MISSING_RULES_FILE)
+    warnRulesNotFound(rulesPath);
 
   const {
     conventionalChangelog: { parserOpts }

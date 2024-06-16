@@ -71,7 +71,7 @@ const lint = (githubToken, githubWorkspace, rulesPath, enforcedScopeTypes, scope
     if (commitlintRules.error === rules_1.MISSING_CHECKOUT)
         (0, warnings_1.warnMissingCheckout)();
     if (commitlintRules.error === rules_1.MISSING_RULES_FILE)
-        (0, warnings_1.warnRulesNotFound)();
+        (0, warnings_1.warnRulesNotFound)(rulesPath);
     const { conventionalChangelog: { parserOpts } } = yield (0, conventional_changelog_conventionalcommits_1.default)(null, null);
     const lintOutput = yield (0, lint_1.default)(pullRequest.title, commitlintRules.rules, {
         parserOpts
@@ -283,7 +283,7 @@ exports.warnPrTitle = exports.warnRulesNotFound = exports.warnMissingCheckout = 
 const core = __importStar(__nccwpck_require__(2186));
 const warnMissingCheckout = () => core.warning(`⚠️  actions/checkout is required to load a custom commitlint rules file. Falling back to default @commitlint/config-conventional lint rules.`);
 exports.warnMissingCheckout = warnMissingCheckout;
-const warnRulesNotFound = () => core.warning(`⚠️  Commitlint rules file not found, falling back to default @commitlint/config-conventional lint rules. If using custom rules, check that 'commitlintRulesPath' matches the relative path and filename of a valid commitlint rules file.`);
+const warnRulesNotFound = (path) => core.warning(`⚠️  Commitlint rules file not found, falling back to default @commitlint/config-conventional lint rules. If using custom rules, check that 'commitlintRulesPath${path ? `: ${path}` : ''}' matches the relative path and filename of a valid commitlint rules file.`);
 exports.warnRulesNotFound = warnRulesNotFound;
 const warnPrTitle = (message) => core.warning(`⚠️  PR title: ${message}`);
 exports.warnPrTitle = warnPrTitle;

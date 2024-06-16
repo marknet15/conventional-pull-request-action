@@ -5,9 +5,9 @@ export const warnMissingCheckout = () =>
     `⚠️  actions/checkout is required to load a custom commitlint rules file. Falling back to default @commitlint/config-conventional lint rules.`
   );
 
-export const warnRulesNotFound = () =>
+export const warnRulesNotFound = (path?: string) =>
   core.warning(
-    `⚠️  Commitlint rules file not found, falling back to default @commitlint/config-conventional lint rules. If using custom rules, check that 'commitlintRulesPath' matches the relative path and filename of a valid commitlint rules file.`
+    `⚠️  Commitlint rules file not found, falling back to default @commitlint/config-conventional lint rules. If using custom rules, check that 'commitlintRulesPath${path ? `: ${path}` : ''}' matches the relative path and filename of a valid commitlint rules file.`
   );
 
 export const warnPrTitle = (message: string) =>
