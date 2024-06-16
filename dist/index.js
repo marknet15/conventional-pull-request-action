@@ -68,8 +68,8 @@ const lint = (githubToken, githubWorkspace, rulesPath, enforcedScopeTypes, scope
     });
     (0, logs_1.logPrTitleFound)(pullRequest.title);
     const commitlintRules = yield (0, rules_1.getLintRules)(rulesPath, githubWorkspace);
-    if (commitlintRules.error === rules_1.MISSING_CHECKOUT)
-        (0, warnings_1.warnMissingCheckout)();
+    if (commitlintRules.error === rules_1.MISSING_WORKSPACE)
+        (0, warnings_1.warnMissingWorkspace)();
     if (commitlintRules.error === rules_1.MISSING_RULES_FILE)
         (0, warnings_1.warnRulesNotFound)(rulesPath);
     const { conventionalChangelog: { parserOpts } } = yield (0, conventional_changelog_conventionalcommits_1.default)(null, null);
@@ -279,10 +279,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.warnPrTitle = exports.warnRulesNotFound = exports.warnMissingCheckout = void 0;
+exports.warnPrTitle = exports.warnRulesNotFound = exports.warnMissingWorkspace = void 0;
 const core = __importStar(__nccwpck_require__(2186));
-const warnMissingCheckout = () => core.warning(`⚠️  actions/checkout is required to load a custom commitlint rules file. Falling back to default @commitlint/config-conventional lint rules.`);
-exports.warnMissingCheckout = warnMissingCheckout;
+const warnMissingWorkspace = () => core.warning(`⚠️  Could not find Github Action Workspace. Falling back to default @commitlint/config-conventional lint rules.`);
+exports.warnMissingWorkspace = warnMissingWorkspace;
 const warnRulesNotFound = (path) => core.warning(`⚠️  Commitlint rules file not found, falling back to default @commitlint/config-conventional lint rules. Check that 'commitlintRulesPath${path ? `: ${path}` : ''}' matches the relative path and filename of a valid commitlint rules file, and you have included the actions/checkout step.`);
 exports.warnRulesNotFound = warnRulesNotFound;
 const warnPrTitle = (message) => core.warning(`⚠️  PR title: ${message}`);
@@ -331,29 +331,6 @@ exports.getActionConfig = getActionConfig;
 
 "use strict";
 
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -367,18 +344,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getLintRules = exports.MISSING_RULES_FILE = exports.MISSING_CHECKOUT = void 0;
-const core = __importStar(__nccwpck_require__(2186));
+exports.getLintRules = exports.MISSING_RULES_FILE = exports.MISSING_WORKSPACE = void 0;
 const path_1 = __importDefault(__nccwpck_require__(1017));
 const config_conventional_1 = __importDefault(__nccwpck_require__(1409));
-exports.MISSING_CHECKOUT = 'MISSING_CHECKOUT';
+exports.MISSING_WORKSPACE = 'MISSING_WORKSPACE';
 exports.MISSING_RULES_FILE = 'MISSING_RULES_FILE';
 const getLintRules = (rules, workspace) => __awaiter(void 0, void 0, void 0, function* () {
     let overrideRules = {};
-    core.info(`Using workspace: ${workspace}`);
     if (rules && (!workspace || workspace === '')) {
         return {
-            error: exports.MISSING_CHECKOUT,
+            error: exports.MISSING_WORKSPACE,
             rules: Object.assign(Object.assign({}, config_conventional_1.default.rules), overrideRules)
         };
     }

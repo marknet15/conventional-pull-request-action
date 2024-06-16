@@ -16,11 +16,11 @@ import {
 } from './outputs/fails';
 import {
   getLintRules,
-  MISSING_CHECKOUT,
-  MISSING_RULES_FILE
+  MISSING_RULES_FILE,
+  MISSING_WORKSPACE
 } from './utils/rules';
 import {
-  warnMissingCheckout,
+  warnMissingWorkspace,
   warnPrTitle,
   warnRulesNotFound
 } from './outputs/warnings';
@@ -61,7 +61,7 @@ const lint = async (
 
   const commitlintRules = await getLintRules(rulesPath, githubWorkspace);
 
-  if (commitlintRules.error === MISSING_CHECKOUT) warnMissingCheckout();
+  if (commitlintRules.error === MISSING_WORKSPACE) warnMissingWorkspace();
   if (commitlintRules.error === MISSING_RULES_FILE)
     warnRulesNotFound(rulesPath);
 

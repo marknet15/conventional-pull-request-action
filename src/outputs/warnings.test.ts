@@ -1,7 +1,7 @@
 import { warning } from '@actions/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  warnMissingCheckout,
+  warnMissingWorkspace,
   warnPrTitle,
   warnRulesNotFound
 } from './warnings';
@@ -21,10 +21,10 @@ describe('Warning outputs', () => {
     vi.resetAllMocks();
   });
 
-  it('`warnMissingCheckout` should pass the expected error to the output', () => {
-    warnMissingCheckout();
+  it('`warnMissingWorkspace` should pass the expected error to the output', () => {
+    warnMissingWorkspace();
     expect(warning).toHaveBeenCalledWith(
-      `⚠️  actions/checkout is required to load a custom commitlint rules file. Falling back to default @commitlint/config-conventional lint rules.`
+      `⚠️  Could not find Github Action Workspace. Falling back to default @commitlint/config-conventional lint rules.`
     );
   });
 

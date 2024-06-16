@@ -1,8 +1,8 @@
 import * as core from '@actions/core';
 
-export const warnMissingCheckout = () =>
+export const warnMissingWorkspace = () =>
   core.warning(
-    `⚠️  actions/checkout is required to load a custom commitlint rules file. Falling back to default @commitlint/config-conventional lint rules.`
+    `⚠️  Could not find Github Action Workspace. Falling back to default @commitlint/config-conventional lint rules.`
   );
 
 export const warnRulesNotFound = (path?: string) =>
