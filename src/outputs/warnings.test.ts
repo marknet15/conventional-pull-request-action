@@ -31,14 +31,14 @@ describe('Warning outputs', () => {
   it('`warnRulesNotFound` should pass the expected error to the output', () => {
     warnRulesNotFound();
     expect(warning).toHaveBeenCalledWith(
-      `⚠️  Commitlint rules file not found, falling back to default @commitlint/config-conventional lint rules. If using custom rules, check that 'commitlintRulesPath' matches the relative path and filename of a valid commitlint rules file.`
+      `⚠️  Commitlint rules file not found, falling back to default @commitlint/config-conventional lint rules. Check that 'commitlintRulesPath' matches the relative path and filename of a valid commitlint rules file, and you have included the actions/checkout step.`
     );
   });
 
   it('`warnRulesNotFound` should pass the expected error to the output when path arg is provided', () => {
     warnRulesNotFound('./commitlint.rules.js');
     expect(warning).toHaveBeenCalledWith(
-      `⚠️  Commitlint rules file not found, falling back to default @commitlint/config-conventional lint rules. If using custom rules, check that 'commitlintRulesPath: ./commitlint.rules.js' matches the relative path and filename of a valid commitlint rules file.`
+      `⚠️  Commitlint rules file not found, falling back to default @commitlint/config-conventional lint rules. Check that 'commitlintRulesPath: ./commitlint.rules.js' matches the relative path and filename of a valid commitlint rules file, and you have included the actions/checkout step.`
     );
   });
 

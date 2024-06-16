@@ -1,6 +1,7 @@
+import * as core from '@actions/core';
+
 import path from 'path';
 import config from '@commitlint/config-conventional';
-import { warnRulesNotFound } from '../outputs/warnings';
 
 export const MISSING_CHECKOUT = 'MISSING_CHECKOUT';
 export const MISSING_RULES_FILE = 'MISSING_RULES_FILE';
@@ -8,7 +9,9 @@ export const MISSING_RULES_FILE = 'MISSING_RULES_FILE';
 export const getLintRules = async (rules?: string, workspace?: string) => {
   let overrideRules = {};
 
-  if (rules && !workspace) {
+  core.info(`Using workspace: ${workspace}`);
+
+  if (rules && (!workspace || workspace === '')) {
     return {
       error: MISSING_CHECKOUT,
       rules: { ...config.rules, ...overrideRules }

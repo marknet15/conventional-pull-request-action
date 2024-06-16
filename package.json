@@ -7,9 +7,9 @@
   "main": "lib/main.js",
   "scripts": {
     "test": "vitest",
-    "build": "tsc",
-    "package": "ncc build --source-map --license licenses.txt",
-    "all": "npm run build && npm run package",
+    "build": "npm run lib && npm run dist",
+    "lib": "tsc",
+    "dist": "ncc build --source-map --license licenses.txt",
     "format:fix": "prettier --write '**/*.ts'",
     "format:check": "prettier --check '**/*.ts'"
   },
