@@ -36,11 +36,11 @@ jobs:
 
 ## Arguments
 
-| Argument              | Required | Example                   | Purpose                                                                                                 |
-| --------------------- | -------- | ------------------------- | ------------------------------------------------------------------------------------------------------- |
-| `commitlintRulesPath` | No       | `'./commitlint.rules.js'` | A relative path from the repo root to a file containing custom Commitlint rules to override the default |
-| `scopeRegex`          | No       | `'[A-Z]+-[0-9]+'`         | A JS regex (without slashes or flags) used to lint the PR scope                                         |
-| `enforcedScopeTypes`  | No       | `'feat\|fix'`             | A list of PR types where the scope is always required and linted                                        |
+| Argument              | Required | Example                   | Purpose                                                                                                                                   |
+| --------------------- | -------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `commitlintRulesPath` | No       | `'./commitlint.rules.js'` | A relative path from the repo root to a file containing custom Commitlint rules to override the default ([docs](#customising-lint-rules)) |
+| `scopeRegex`          | No       | `'[A-Z]+-[0-9]+'`         | A JS regex (without slashes or flags) used to lint the PR scope ([docs](#linting-scope))                                                  |
+| `enforcedScopeTypes`  | No       | `'feat\|fix'`             | A list of PR types where the scope is always required and linted ([docs](#skipping-scope-linting))                                        |
 
 ## Usage
 
