@@ -11,7 +11,6 @@ inputs:
   commitlintRulesPath:
     description: 'Relative path to commitlint rules file'
     required: false
-    default: './commitlint.rules.js'
   enforcedScopeTypes:
     description: A list of PR types that will trigger the scopeRegex function to run. eg `feat|fix` will allow 'chore' PRs to skip the regex scope check. If left empty, only PRs which include a scope will trigger the check.
     required: false
