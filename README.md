@@ -74,7 +74,7 @@ module.exports = {
 };
 ```
 
-Note that if you include a custom rules file you need to add the `actions/checkout` step before the linter, so it is able to reference your custom rules file. If you just want to run with the default rules, the checkout step is not required.
+If you include a custom rules file you need to add the `actions/checkout` step before the linter, so it is able to reference your custom rules file. If you just want to run with the default rules, the checkout step is not required.
 
 ### Linting scope
 
@@ -88,7 +88,7 @@ For example, to enforce scopes containing a valid Jira ticket ID (`ABC-123`), th
 scopeRegex: '^[A-Z]+-[0-9]+$'
 ```
 
-Note that by default, scope linting will only occur when a PR title contains a scope. If you wish to enforce that all PRs must contain a scope to be linted, you should set `'scope-empty': [2, 'never']` in your custom rules.
+By default, scope linting will only occur when a PR title contains a scope. If you wish to enforce that all PRs must contain a scope to be linted, you should set `'scope-empty': [2, 'never']` in your custom rules.
 
 #### Example regexes
 
