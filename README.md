@@ -74,6 +74,8 @@ module.exports = {
 };
 ```
 
+Note that if you include a custom rules file you need to add the `actions/checkout` step before the linter, so it is able to reference your custom rules file. If you just want to run with the default rules, the checkout step is not required.
+
 ### Linting scope
 
 To enforce a format for PR scopes, you can pass a `scopeRegex` value containing a valid JS regex.
