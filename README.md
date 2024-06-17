@@ -32,7 +32,7 @@ jobs:
         with:
           commitlintRulesPath: './commitlint.rules.js'
           enforcedScopeTypes: 'feat|fix'
-          scopeRegex: '[A-Z]+-[0-9]+'
+          scopeRegex: '^[A-Z]+-[0-9]+$'
 ```
 
 ## Arguments
@@ -85,7 +85,7 @@ Note that this is converted using `RegExp()` by the action, so should not includ
 For example, to enforce scopes containing a valid Jira ticket ID (`ABC-123`), the following Regex would be provided;
 
 ```yaml
-scopeRegex: '[A-Z]+-[0-9]+'
+scopeRegex: '^[A-Z]+-[0-9]+$'
 ```
 
 Note that by default, scope linting will only occur when a PR title contains a scope. If you wish to enforce that all PRs must contain a scope to be linted, you should set `'scope-empty': [2, 'never']` in your custom rules.
@@ -97,7 +97,7 @@ Note that by default, scope linting will only occur when a PR title contains a s
 Lint for any Jira ticket format, eg `FOO-123`, `BAR-234`, `BAZ-345`
 
 ```ts
-[A-Z]+-[0-9]+
+^[A-Z]+-[0-9]+$
 ```
 
 ##### Specific Jira project tickets
@@ -105,7 +105,7 @@ Lint for any Jira ticket format, eg `FOO-123`, `BAR-234`, `BAZ-345`
 Only allow tickets from three specific projects; `SPECIFIC-123`, `JIRA-234`, `PROJECT-345`. `FOO-456` would be rejected.
 
 ```ts
-\b(SPECIFIC|JIRA|PROJECT)\b-[0-9]+
+^\b(SPECIFIC|JIRA|PROJECT)\b-[0-9]+$
 ```
 
 ### Skipping scope linting
