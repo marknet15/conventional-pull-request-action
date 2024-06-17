@@ -2,7 +2,7 @@ import { warning } from '@actions/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   warnMissingWorkspace,
-  warnPrTitle,
+  warnLinting,
   warnRulesNotFound
 } from './warnings';
 
@@ -24,26 +24,26 @@ describe('Warning outputs', () => {
   it('`warnMissingWorkspace` should pass the expected error to the output', () => {
     warnMissingWorkspace();
     expect(warning).toHaveBeenCalledWith(
-      `⚠️  Could not find Github Action Workspace. Falling back to default @commitlint/config-conventional lint rules.`
+      `⚠️ Could not find Github Action Workspace. Falling back to default @commitlint/config-conventional lint rules.`
     );
   });
 
   it('`warnRulesNotFound` should pass the expected error to the output', () => {
     warnRulesNotFound();
     expect(warning).toHaveBeenCalledWith(
-      `⚠️  Commitlint rules file not found, falling back to default @commitlint/config-conventional lint rules. Check that 'commitlintRulesPath' matches the relative path and filename of a valid commitlint rules file, and you have included the actions/checkout step.`
+      `⚠️ Commitlint rules file not found, falling back to default @commitlint/config-conventional lint rules. Check that 'commitlintRulesPath' matches the relative path and filename of a valid commitlint rules file, and you have included the actions/checkout step.`
     );
   });
 
   it('`warnRulesNotFound` should pass the expected error to the output when path arg is provided', () => {
     warnRulesNotFound('./commitlint.rules.js');
     expect(warning).toHaveBeenCalledWith(
-      `⚠️  Commitlint rules file not found, falling back to default @commitlint/config-conventional lint rules. Check that 'commitlintRulesPath: ./commitlint.rules.js' matches the relative path and filename of a valid commitlint rules file, and you have included the actions/checkout step.`
+      `⚠️ Commitlint rules file not found, falling back to default @commitlint/config-conventional lint rules. Check that 'commitlintRulesPath: ./commitlint.rules.js' matches the relative path and filename of a valid commitlint rules file, and you have included the actions/checkout step.`
     );
   });
 
   it('`warnPrTitle` should pass the expected error to the output with given arguments', () => {
-    warnPrTitle(`Doesn't look right!`);
-    expect(warning).toHaveBeenCalledWith(`⚠️  PR title: Doesn't look right!`);
+    warnLinting(`Doesn't look right!`);
+    expect(warning).toHaveBeenCalledWith(`⚠️ Commitlint: Doesn't look right!`);
   });
 });

@@ -74,14 +74,14 @@ describe('Linter', () => {
     await lint.apply(null, mockArgs);
 
     expect(info).toHaveBeenCalledWith(
-      '🕵️  Found PR title: "feat(BAR-1234): hello i am a valid title"'
+      '🕵️ Found PR title: "feat(BAR-1234): hello i am a valid title"'
     );
   });
 
   it.each([
-    'fix: subject is valid',
-    'feat(BAR-1234): subject is valid',
-    'feat!: subject is valid'
+    'fix: Subject is valid',
+    'feat(BAR-1234): Subject is valid',
+    'feat!: Subject is valid'
   ])(
     'should output a success message if PR title is valid: %s',
     async title => {
@@ -100,6 +100,9 @@ describe('Linter', () => {
 
       await lint.apply(null, mockArgs);
 
+      expect(info).toHaveBeenCalledWith(
+        '📋 Found custom commitlint rules file at "./src/fixtures/commitlint.rules.js". Checking PR title with commitlint'
+      );
       expect(info).toHaveBeenLastCalledWith(
         '✅ PR title validated successfully'
       );
@@ -109,6 +112,33 @@ describe('Linter', () => {
       expect(setFailed).not.toHaveBeenCalled();
     }
   );
+
+  it('should output a success message if PR title is valid and no custom rules are provided', async () => {
+    mocks.getOctokit.mockReturnValue({
+      rest: {
+        pulls: {
+          get: vi.fn().mockReturnValue({
+            data: {
+              commits: 1,
+              title: 'fix: commit title is valid'
+            }
+          })
+        }
+      }
+    });
+
+    await lint.apply(
+      null,
+      mockArgs.filter(arg => arg !== mockArgs[1])
+    );
+
+    expect(info).toHaveBeenCalledWith('📋 Checking PR title with commitlint');
+    expect(info).toHaveBeenLastCalledWith('✅ PR title validated successfully');
+
+    expect(error).not.toHaveBeenCalled();
+    expect(warning).not.toHaveBeenCalled();
+    expect(setFailed).not.toHaveBeenCalled();
+  });
 
   it('should fail and output an error if title does not have a type', async () => {
     mocks.getOctokit.mockReturnValue({
@@ -126,7 +156,7 @@ describe('Linter', () => {
 
     await lint.apply(null, mockArgs);
 
-    expect(error).toHaveBeenCalledWith('⛔️ PR title: type may not be empty');
+    expect(error).toHaveBeenCalledWith('⛔️ Commitlint: type may not be empty');
     expect(setFailed).toHaveBeenCalledWith(
       '🛑 Pull request title does not conform to the conventional commit spec'
     );
@@ -149,7 +179,7 @@ describe('Linter', () => {
     await lint.apply(null, mockArgs);
 
     expect(error).toHaveBeenCalledWith(
-      '⛔️ PR title: subject must be lower-case'
+      '⛔️ Commitlint: subject must not be upper-case'
     );
     expect(setFailed).toHaveBeenCalledWith(
       '🛑 Pull request title does not conform to the conventional commit spec'
@@ -174,7 +204,7 @@ describe('Linter', () => {
     await lint.apply(null, mockArgs);
 
     expect(warning).toHaveBeenCalledWith(
-      '⚠️  PR title: subject must not be longer than 20 characters'
+      '⚠️ Commitlint: subject must not be longer than 20 characters'
     );
     expect(info).toHaveBeenLastCalledWith(
       '✅ PR title validated with warnings'
@@ -229,6 +259,9 @@ describe('Linter', () => {
       new RegExp(`\\b(FOO|BAR|BAZ)\\b-[0-9]+`, 'g')
     ]);
 
+    expect(info).toHaveBeenCalledWith(
+      `👀 Found scope "FOO-123". Linting with "/\\b(FOO|BAR|BAZ)\\b-[0-9]+/g\"`
+    );
     expect(setFailed).not.toHaveBeenCalled();
   });
 
@@ -253,6 +286,9 @@ describe('Linter', () => {
       new RegExp(`\\b(FOO|BAR|BAZ)\\b-[0-9]+`, 'g')
     ]);
 
+    expect(info).toHaveBeenCalledWith(
+      `👀 Found scope "FOO-123". Linting with "/\\b(FOO|BAR|BAZ)\\b-[0-9]+/g\"`
+    );
     expect(info).toHaveBeenLastCalledWith(
       '✅ PR title validated with warnings'
     );
@@ -280,7 +316,7 @@ describe('Linter', () => {
     ]);
 
     expect(info).toHaveBeenCalledWith(
-      `⏩ Skipping scope check for type 'chore'`
+      `⏩ Skipping scope check for type "chore"`
     );
     expect(info).toHaveBeenLastCalledWith('✅ PR title validated successfully');
     expect(setFailed).not.toHaveBeenCalled();

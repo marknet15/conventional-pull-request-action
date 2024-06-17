@@ -4,6 +4,9 @@ import conventionalCommitsParser from 'conventional-commits-parser';
 import createPreset from 'conventional-changelog-conventionalcommits';
 import {
   logActionSuccessful,
+  logLintableScopeFound,
+  logLintingPrTitle,
+  logLintingPrTitleWithCustomRules,
   logPrTitleFound,
   logScopeCheckSkipped
 } from './outputs/logs';
@@ -20,11 +23,11 @@ import {
   MISSING_WORKSPACE
 } from './utils/rules';
 import {
+  warnLinting,
   warnMissingWorkspace,
-  warnPrTitle,
   warnRulesNotFound
 } from './outputs/warnings';
-import { errorPrTitle } from './outputs/errors';
+import { errorLinting } from './outputs/errors';
 
 const lint = async (
   githubToken?: string,
@@ -65,6 +68,12 @@ const lint = async (
   if (commitlintRules.error === MISSING_RULES_FILE)
     warnRulesNotFound(rulesPath);
 
+  if (rulesPath && !commitlintRules.error) {
+    logLintingPrTitleWithCustomRules(rulesPath);
+  } else {
+    logLintingPrTitle();
+  }
+
   const {
     conventionalChangelog: { parserOpts }
   } = await createPreset(null, null);
@@ -76,8 +85,8 @@ const lint = async (
       parserOpts
     }
   );
-  lintOutput.warnings.forEach(warn => warnPrTitle(warn.message));
-  lintOutput.errors.forEach(err => errorPrTitle(err.message));
+  lintOutput.warnings.forEach(warn => warnLinting(warn.message));
+  lintOutput.errors.forEach(err => errorLinting(err.message));
 
   const hasWarnings = lintOutput.warnings.length > 0;
 
@@ -95,8 +104,12 @@ const lint = async (
       return setFailedScopeRequired(type);
     }
 
-    if (scope && scopeRegex && !scope.match(scopeRegex)) {
-      return setFailedScopeNotValid(scopeRegex.toString());
+    if (scope && scopeRegex) {
+      logLintableScopeFound(scope, scopeRegex.toString());
+
+      if (!scope.match(scopeRegex)) {
+        return setFailedScopeNotValid(scopeRegex.toString());
+      }
     }
   } else {
     if (type) logScopeCheckSkipped(type);

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { error } from '@actions/core';
-import { errorPrTitle } from './errors';
+import { errorLinting } from './errors';
 
 vi.mock('@actions/core', async importOriginal => {
   const mod = await importOriginal<typeof import('@actions/core')>();
@@ -17,10 +17,10 @@ describe('Error outputs', () => {
     vi.restoreAllMocks();
   });
 
-  it('`errorPrTitle` should pass the expected error to the output', () => {
-    errorPrTitle(`Definitely isn't right!!`);
+  it('`errorLinting` should pass the expected error to the output', () => {
+    errorLinting(`Definitely isn't right!!`);
     expect(error).toHaveBeenCalledWith(
-      `⛔️ PR title: Definitely isn't right!!`
+      `⛔️ Commitlint: Definitely isn't right!!`
     );
   });
 });
