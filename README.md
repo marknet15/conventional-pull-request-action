@@ -105,7 +105,7 @@ Lint for any Jira ticket format, eg `FOO-123`, `BAR-234`, `BAZ-345`
 Only allow tickets from three specific projects; `SPECIFIC-123`, `JIRA-234`, `PROJECT-345`. `FOO-456` would be rejected.
 
 ```ts
-^\b(SPECIFIC|JIRA|PROJECT)\b-[0-9]+$
+^((SPECIFIC|JIRA|PROJECT)-[0-9]+)$
 ```
 
 ### Skipping scope linting
